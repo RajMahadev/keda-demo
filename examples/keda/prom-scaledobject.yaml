@@ -1,0 +1,36 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: from-zero
+spec:
+  scaleTargetRef:
+    apiVersion:    apps/v1
+    kind:          Deployment
+    name:          consumer-workload
+  pollingInterval: 10
+  # The period to wait after the last trigger reported active before scaling the resource back to 0
+  cooldownPeriod:  30
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 30
+          policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 3
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 3
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://<prometheus-host>:9090
+      metricName: http_requests_total
+      query: increase(promhttp_metric_handler_requests_total{namespace="keda-demo", code="200"}[30s])
+      threshold: '3'

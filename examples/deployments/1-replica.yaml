@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: consumer-workload
+  name: consumer-workload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-workload
+  template:
+    metadata:
+      labels:
+        app: consumer-workload
+    spec:
+      containers:
+        - image: alpine:3.13.5
+          name: alpine
+          command: ['sh', '-c', 'sleep 365d']
