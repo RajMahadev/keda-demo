@@ -1,12 +1,8 @@
 # keda-demo
 
-## Prerequisites
-
-* Have the prometheus-operator installed and configured to look for `ServiceMonitor`s in the `keda-demo` namespace. You can use the community 
-
 ## Setup
 
-These are the steps required for setting up and running the demo.
+These are the steps required for setting up and running the demos.
 
 ### Fetch the Helm Repositories
 
@@ -50,3 +46,64 @@ Deploy a `Deployment` object with 1 replica to the `keda-demo` namespace.
 ```
 kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 ```
+
+## Demos
+
+### Autoscaling with Prometheus Metrics
+
+#### Prerequisites
+
+* Have the prometheus-operator installed and configured to look for `ServiceMonitor`s in the `keda-demo` namespace. You can use the community helm chart
+* Optional, have [Ambassador's Telepresence v2](https://www.getambassador.io/docs/telepresence/latest/install/) installed
+
+#### Steps
+
+1. Update the `serverAddress` in the `examples/keda/prom-scaledobject.yaml` file.
+    * If you want to access it interally, you can use the format `http://SVC_NAME.NAMESPACE.svc.cluster.local:9090`. If your prometheus instance is served on a subpath you must attach the subpath after the port number (e.g. `http://SVC_NAME.NAMESPACE.svc.cluster.local:9090/prometheus`)
+2. Deploy the `ScaledObject` with the prometheus trigger
+
+    ```
+    kubectl apply -f examples/keda/prom-scaledobject.yaml
+    ```
+
+3. Check the scaled object is ready with `kubectl get scaledobject -n keda-demo`
+4. If it is not ready, check the logs of the keda pod (`keda logs POD_NAME -n keda-demo`). It'll most likely be the server address being incorrect.
+5. Check and examine the HPA object created by KEDA with `kubectl get hpa -n keda-demo` and `kubectl describe hpa -n keda-demo`.
+6. Open another terminal and watch the pods in the `keda-demo` namespace with `kubectl get pods -n keda-demo -w`.
+7. Open another terminal and watch the deployments in the `keda-demo` namespace with `kubectl get deployments -n keda-demo -w`.
+8. Now we want to trigger the autoscaling. If you have telepresence, repeatedly run curl commands against the PodInfo service with `podinfo.keda-demo:9898/metrics`.
+    * If you don't have telepresence you can exec into another pod with curl installed and run `curl podinfo.keda-demo.svc.cluster.local:9898/metrics` from within the context of that pod,
+9. As you run the curl commands, you'll eventually notice the number of replicas of the consumer workload increase in the other terminals.
+10. Stop running the curl commands.
+11. Wait until the `Deployment` scales down back to the minimum number of replicas
+
+### Autoscaling with Redis Lists
+
+#### Steps
+
+1. Deploy the redis `Deployment` and `Service`
+    ```
+    kubectl apply -f examples/deployments/redis.yaml
+    kubectl apply -f examples/deployments/redis-svc.yaml
+    ```
+2. Confirm the redis pod is running with `kubectl get pods -n keda-demo`
+3. Confirm the redis service has successfully found the redis pod by checking an endpoint exists with `kubectl get endpoints -n keda-demo`
+4. Deploy the `ScaledObject` with the redis trigger
+
+    ```
+    kubectl apply -f examples/keda/redis-scaledobject.yaml
+    ```
+
+5. Check the scaled object is ready with `kubectl get scaledobject -n keda-demo`
+6. If it is not ready, check the logs of the keda pod (`keda logs POD_NAME -n keda-demo`). It'll most likely be the server address being incorrect.
+7. Check and examine the HPA object created by KEDA with `kubectl get hpa -n keda-demo` and `kubectl describe hpa -n keda-demo`.
+8. Open another terminal and watch the pods in the `keda-demo` namespace with `kubectl get pods -n keda-demo -w`
+9. Open another terminal and watch the deployments in the `keda-demo` namespace with `kubectl get deployments -n keda-demo -w`
+10. Now we want to trigger the autoscaling. Exec into the redis pod with `kubectl exec redis-(RANDOM_STRING) -it -n keda-demo -- redis-cli`
+11. Check the length of the list stored in the `mylist` key with `LLEN mylist`
+12. Add to the list with `LLPUSH mylist "string"` until the length of the list is above the threshold.
+13. One additional replica should have been created.
+14. Continuing adding items to the list until the threshold is `(threshold x 2) + 1)`.
+15. Another replica should be created.
+16. Remove items from the list with `LPOP mylist` until the length of the list is below the threshold.
+17. Wait until the `Deployment` scales down back to the minimum number of replicas.
