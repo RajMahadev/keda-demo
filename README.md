@@ -49,7 +49,7 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 
 ## Demos
 
-### Autoscaling with Prometheus Metrics
+### Autoscaling a Deployment with a Prometheus Metrics
 
 #### Prerequisites
 
@@ -76,8 +76,13 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 9. As you run the curl commands, you'll eventually notice the number of replicas of the consumer workload increase in the other terminals.
 10. Stop running the curl commands.
 11. Wait until the `Deployment` scales down back to the minimum number of replicas
+12. Clean up the resources
 
-### Autoscaling with Redis Lists
+    ```
+    kubectl delete -f examples/keda/prom-scaledobject.yaml
+    ```
+
+### Autoscaling a Deployment with a Redis List
 
 #### Steps
 
@@ -107,3 +112,45 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 15. Another replica should be created.
 16. Remove items from the list with `LPOP mylist` until the length of the list is below the threshold.
 17. Wait until the `Deployment` scales down back to the minimum number of replicas.
+18. Clean up the resources
+
+    ```
+      kubectl delete -f examples/deployments/redis.yaml
+      kubectl delete -f examples/deployments/redis-svc.yaml
+      kubectl delete -f examples/keda/redis-scaledobject.yaml
+    ```
+
+### Autoscaling Jobs with a Redis List
+
+#### Steps
+
+1. Deploy the redis `Deployment` and `Service`
+    ```
+    kubectl apply -f examples/deployments/redis.yaml
+    kubectl apply -f examples/deployments/redis-svc.yaml
+    ```
+2. Confirm the redis pod is running with `kubectl get pods -n keda-demo`
+3. Confirm the redis service has successfully found the redis pod by checking an endpoint exists with `kubectl get endpoints -n keda-demo`
+4. Deploy the `ScaledJob` with the redis trigger
+
+    ```
+    kubectl apply -f examples/keda/redis-scaledjob.yaml
+    ```
+
+5. Check the scaled object is ready with `kubectl get scaledobject -n keda-demo`
+6. If it is not ready, check the logs of the keda pod (`keda logs POD_NAME -n keda-demo`). It'll most likely be the server address being incorrect.
+7. Open another terminal and watch the pods in the `keda-demo` namespace with `kubectl get pods -n keda-demo -w`
+8. Open another terminal and watch the jobs in the `keda-demo` namespace with `kubectl get jobs -n keda-demo -w`
+9.  Now we want to trigger the autoscaling. Exec into the redis pod with `kubectl exec redis-(RANDOM_STRING) -it -n keda-demo -- redis-cli`
+10. Check the length of the list stored in the `myotherlist` key with `LLEN myotherlist`
+11. Add to the list with `LLPUSH myotherlist "myotherlist"` until the length of the list is above the threshold.
+12. One additional replica should have been created.
+13. Wait and observe as more jobs continously get created.
+14. Remove the other from the list with `LPOP myotherlist`
+15. Wait and observe no more jobs are created.
+
+    ```
+      kubectl delete -f examples/deployments/redis.yaml
+      kubectl delete -f examples/deployments/redis-svc.yaml
+      kubectl delete -f examples/keda/redis-scaledjob.yaml
+    ```
