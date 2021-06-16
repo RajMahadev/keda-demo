@@ -68,7 +68,7 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 
 #### Prerequisites
 
-* Have the prometheus-operator installed and configured to look for `ServiceMonitor`s in the `keda-demo` namespace. You can use the community helm chart
+* Have the prometheus-operator installed and configured to look for `ServiceMonitor`s in the `keda-demo` namespace. You can use the [community helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) to install it
 * Optional, have [Ambassador's Telepresence v2](https://www.getambassador.io/docs/telepresence/latest/install/) installed
 
 #### Steps
@@ -91,7 +91,7 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 9. As you run the curl commands, you'll eventually notice the number of replicas of the consumer workload increase in the other terminals.
 10. Stop running the curl commands.
 11. Wait until the `Deployment` scales down back to the minimum number of replicas
-12. Clean up the resources
+12. Clean up the resources.
 
     ```
     kubectl delete -f examples/keda/prom-scaledobject.yaml
@@ -127,7 +127,7 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 15. Another replica should be created.
 16. Remove items from the list with `LPOP mylist` until the length of the list is below the threshold.
 17. Wait until the `Deployment` scales down back to the minimum number of replicas.
-18. Clean up the resources
+18. Clean up the resources.
 
     ```
       kubectl delete -f examples/deployments/redis.yaml
@@ -146,7 +146,7 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
     ```
 2. Confirm the redis pod is running with `kubectl get pods -n keda-demo`
 3. Confirm the redis service has successfully found the redis pod by checking an endpoint exists with `kubectl get endpoints -n keda-demo`
-4. Deploy the `ScaledJob` with the redis trigger
+4. Deploy the `ScaledJob` with the redis trigger.
 
     ```
     kubectl apply -f examples/keda/redis-scaledjob.yaml
@@ -162,7 +162,8 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 12. One additional replica should have been created.
 13. Wait and observe as more jobs continously get created.
 14. Remove the other from the list with `LPOP myotherlist`
-15. Wait and observe no more jobs are created.
+15. Wait and observe as no more jobs are created.
+16. Clean up the resources.
 
     ```
       kubectl delete -f examples/deployments/redis.yaml
