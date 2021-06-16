@@ -1,5 +1,20 @@
 # keda-demo
 
+* [keda-demo](#keda-demo)
+  * [Setup](#setup)
+    * [Fetch the Helm Repositories](#fetch-the-helm-repositories)
+    * [Install KEDA](#install-keda)
+    * [Install the Metrics Exporter Workloads (PodInfo)](#install-the-metrics-exporter-workloads-podinfo)
+    * [Install a Deployment with 1 Replica](#install-a-deployment-with-1-replica)
+  * [Demos](#demos)
+    * [Autoscaling a Deployment with a Prometheus Metrics](#autoscaling-a-deployment-with-a-prometheus-metrics)
+      * [Prerequisites](#prerequisites)
+      * [Steps](#steps)
+    * [Autoscaling a Deployment with a Redis List](#autoscaling-a-deployment-with-a-redis-list)
+      * [Steps](#steps-1)
+    * [Autoscaling Jobs with a Redis List](#autoscaling-jobs-with-a-redis-list)
+      * [Steps](#steps-2)
+
 ## Setup
 
 These are the steps required for setting up and running the demos.
