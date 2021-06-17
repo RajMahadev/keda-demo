@@ -5,7 +5,7 @@
     * [Fetch the Helm Repositories](#fetch-the-helm-repositories)
     * [Install KEDA](#install-keda)
     * [Install the Metrics Exporter Workloads (PodInfo)](#install-the-metrics-exporter-workloads-podinfo)
-    * [Install a Deployment with 1 Replica](#install-a-deployment-with-1-replica)
+    * [Install a Deployment](#install-a-deployment)
   * [Demos](#demos)
     * [Autoscaling a Deployment with a Prometheus Metrics](#autoscaling-a-deployment-with-a-prometheus-metrics)
       * [Prerequisites](#prerequisites)
@@ -54,12 +54,12 @@ helm install podinfo --namespace keda-demo podinfo/podinfo --version 5.2.1 --set
 
 After installation, go to the `/prometheus/targets` endpoint for you prometheus instance and confirm that the PodInfo workload is a target that is successfully being scraped.
 
-### Install a Deployment with 1 Replica
+### Install a Deployment
 
-Deploy a `Deployment` object with 1 replica to the `keda-demo` namespace.
+Deploy a `Deployment` object `keda-demo` namespace.
 
 ```
-kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
+kubectl apply -n keda-demo -f examples/deployments/example-workload.yaml
 ```
 
 ## Demos
@@ -86,7 +86,7 @@ kubectl apply -n keda-demo -f examples/deployments/1-replica.yaml
 5. Check and examine the HPA object created by KEDA with `kubectl get hpa -n keda-demo` and `kubectl describe hpa -n keda-demo`.
 6. Open another terminal and watch the pods in the `keda-demo` namespace with `kubectl get pods -n keda-demo -w`.
 7. Open another terminal and watch the deployments in the `keda-demo` namespace with `kubectl get deployments -n keda-demo -w`.
-8. Now we want to trigger the autoscaling. If you have telepresence, repeatedly run curl commands against the PodInfo service with `podinfo.keda-demo:9898/metrics`.
+8. Now we want to trigger the autoscaling. If you have telepresence, repeatedly run curl commands against the PodInfo service with `while :; do curl podinfo.keda-demo:9898; sleep 1; done`.
     * If you don't have telepresence you can exec into another pod with curl installed and run `curl podinfo.keda-demo.svc.cluster.local:9898/metrics` from within the context of that pod,
 9. As you run the curl commands, you'll eventually notice the number of replicas of the consumer workload increase in the other terminals.
 10. Stop running the curl commands.

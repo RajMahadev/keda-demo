@@ -1,14 +1,13 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: from-zero
+  name: scale-example-workload
 spec:
   scaleTargetRef:
     apiVersion:    apps/v1
     kind:          Deployment
-    name:          consumer-workload
-  pollingInterval: 10
-  # The period to wait after the last trigger reported active before scaling the resource back to 0
+    name:          example-workload
+  pollingInterval: 3
   cooldownPeriod:  30
   minReplicaCount: 1
   maxReplicaCount: 5
