@@ -123,11 +123,9 @@ kubectl apply -n keda-demo -f examples/deployments/example-workload.yaml
 11. Check the length of the list stored in the `mylist` key with `LLEN mylist`
 12. Add to the list with `LLPUSH mylist "string"` until the length of the list is above the threshold.
 13. One additional replica should have been created.
-14. Continuing adding items to the list until the threshold is `(threshold x 2) + 1)`.
-15. Another replica should be created.
-16. Remove items from the list with `LPOP mylist` until the length of the list is below the threshold.
-17. Wait until the `Deployment` scales down back to the minimum number of replicas.
-18. Clean up the resources.
+14. Remove items from the list with `LPOP mylist` until the length of the list is below the threshold.
+15. Wait until the `Deployment` scales down back to the minimum number of replicas.
+16. Clean up the resources.
 
     ```
       kubectl delete -f examples/deployments/redis.yaml
@@ -152,16 +150,16 @@ kubectl apply -n keda-demo -f examples/deployments/example-workload.yaml
     kubectl apply -f examples/keda/redis-scaledjob.yaml
     ```
 
-5. Check the scaled object is ready with `kubectl get scaledobject -n keda-demo`
+5. Check the scaled object is ready with `kubectl get scaledjob -n keda-demo`
 6. If it is not ready, check the logs of the keda pod (`keda logs POD_NAME -n keda-demo`). It'll most likely be the server address being incorrect.
 7. Open another terminal and watch the pods in the `keda-demo` namespace with `kubectl get pods -n keda-demo -w`
 8. Open another terminal and watch the jobs in the `keda-demo` namespace with `kubectl get jobs -n keda-demo -w`
-9.  Now we want to trigger the autoscaling. Exec into the redis pod with `kubectl exec redis-(RANDOM_STRING) -it -n keda-demo -- redis-cli`
+9. Now we want to trigger the autoscaling. Exec into the redis pod with `kubectl exec redis-(RANDOM_STRING) -it -n keda-demo -- redis-cli`
 10. Check the length of the list stored in the `myotherlist` key with `LLEN myotherlist`
 11. Add to the list with `LLPUSH myotherlist "myotherlist"` until the length of the list is above the threshold.
 12. One additional replica should have been created.
 13. Wait and observe as more jobs continously get created.
-14. Remove the other from the list with `LPOP myotherlist`
+14. Remove the item from the list with `LPOP myotherlist`
 15. Wait and observe as no more jobs are created.
 16. Clean up the resources.
 
