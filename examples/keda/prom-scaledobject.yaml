@@ -1,12 +1,13 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: scale-example-workload
+  name: prometheus-scaledobject
+  namespace: ingress-nginx
 spec:
   scaleTargetRef:
     apiVersion:    apps/v1
     kind:          Deployment
-    name:          example-workload
+    name:          function-helloworld-http
   pollingInterval: 3
   cooldownPeriod:  30
   minReplicaCount: 1
@@ -31,5 +32,5 @@ spec:
     metadata:
       serverAddress: http://prometheus-server.ingress-nginx.svc.cluster.local:9090
       metricName: http_requests_total
-      query: increase(promhttp_metric_handler_requests_total{namespace="keda-demo", code="200"}[30s])
-      threshold: '3'
+      query: sum(rate(nginx_ingress_controller_requests[1m]))
+      threshold: '2'
