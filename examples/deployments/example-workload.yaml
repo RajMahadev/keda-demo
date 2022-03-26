@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: example-workload
-  name: example-workload
+    app: function-helloworld-http
+  name: function-helloworld-http
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: example-workload
+      app: function-helloworld-http
   template:
     metadata:
       labels:
-        app: example-workload
+        app: function-helloworld-http
     spec:
       containers:
         - image: alpine:3.13.5
