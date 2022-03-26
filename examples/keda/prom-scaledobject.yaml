@@ -29,7 +29,7 @@ spec:
   triggers:
   - type: prometheus
     metadata:
-      serverAddress: http://<prometheus-host>:9090
+      serverAddress: http://prometheus-server.ingress-nginx.svc.cluster.local:9090
       metricName: http_requests_total
       query: increase(promhttp_metric_handler_requests_total{namespace="keda-demo", code="200"}[30s])
       threshold: '3'
